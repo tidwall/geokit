@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<title>GeoKit - Nearest</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="app.css" />
+<script src="geokit.js"></script>
+<script src="app.js"></script>
+</head>
+<body>
+<script>
+
+run({ 
+	name: "nearest",
+	show: ["a", "b", "c", "d"],
+	draw: draw,
+	about: `The nearest function takes two geodesic segments and determines the
+	        shortest connecting path.
+			This can be used to get the distance and closest point of
+			intersection between two segments.
+			`
+});
+
+function draw(shape, a, b, c, d, zoom) {
+	let res = nearest(shape, a.lat, a.lon, b.lat, b.lon, c.lat, c.lon, d.lat, d.lon);
+	let e = { lat: res.lat1, lon: res.lon1 };
+	let f = { lat: res.lat2, lon: res.lon2 };
+
+	drawLine("ae", shape, a.lat, a.lon, e.lat, e.lon);
+	drawLine("eb", shape, e.lat, e.lon, b.lat, b.lon);
+	drawLine("cf", shape, c.lat, c.lon, f.lat, f.lon);
+	drawLine("fd", shape, f.lat, f.lon, d.lat, d.lon);
+
+	if (res.s12 > 0) {
+		drawLine("ef", shape, e.lat, e.lon, f.lat, f.lon, { dashed: true });
+		drawDot("e", shape, e.lat, e.lon);
+	}
+	drawDot("f", shape, f.lat, f.lon);
+	info.log("A: " + a.lat.toFixed(5) + " " + a.lon.toFixed(5));
+	info.log("B: " + b.lat.toFixed(5) + " " + b.lon.toFixed(5));
+	info.log("C: " + c.lat.toFixed(5) + " " + c.lon.toFixed(5));
+	info.log("D: " + d.lat.toFixed(5) + " " + d.lon.toFixed(5));
+	info.log("------------------------");
+	info.log("pnt1: " + e.lat.toFixed(5) + " " + e.lon.toFixed(5));
+	info.log("azi1: " + res.azi1.toFixed(2) + "°");
+	info.log("dist: " + toDist(res.s12));
+	info.log("pnt2: " + f.lat.toFixed(5) + " " + f.lon.toFixed(5));
+	info.log("azi2: " + res.azi2.toFixed(2) + "°");
+	if (res.s12 == 0) {
+		mininfo = "(intersecting)"
+	} else {
+		mininfo = toDist(res.s12)
+	}
+
+}
+
+</script>
+</body>
+</html>

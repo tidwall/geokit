@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<title>GeoKit - Inverse</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="app.css" />
+<script src="geokit.js"></script>
+<script src="app.js"></script>
+</head>
+<body>
+<script>
+run({ 
+	name: "inverse",
+	show: ["a", "b"],
+	repl: {"a": "1", "b": "2" },
+	draw: draw,
+	about: `The inverse function takes two points and returns the distance from point 1 to point 2, 
+	        the initial azimuth from point 1 moving in the direction towards point 2, and the final
+			azimuth from point 2 continuing further along the geodesic path.`,
+			
+});
+function draw(shape, a, b, c, d, zoom) {
+	let ab = inverse(shape, a.lat, a.lon, b.lat, b.lon);
+	drawLine("ab", shape, a.lat, a.lon, b.lat, b.lon);
+	info.log("pnt1: " + a.lat.toFixed(5) + " " + a.lon.toFixed(5));
+	info.log("pnt2: " + b.lat.toFixed(5) + " " + b.lon.toFixed(5));
+	info.log("------------------------");
+	info.log("dist: " + toDist(ab.s12));
+	info.log("azi1: " + ab.azi1.toFixed(2) + "°");
+	info.log("azi2: " + ab.azi2.toFixed(2) + "°");
+	mininfo = toDist(ab.s12) + " " + ab.azi1.toFixed(2) + "°";
+}
+</script>
+</body>
+</html>

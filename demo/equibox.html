@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<title>GeoKit - Equibox</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="app.css" />
+<script src="geokit.js"></script>
+<script src="app.js"></script>
+</head>
+<body>
+<script>
+run({ 
+	name: "equibox",
+	show: ["a", "b"],
+	repl: { "a": "1", "b": "2"},
+	draw: draw,
+	about: `The equibox function takes two points and calculates the extents
+	        of an equirectangular bounding box that is able to fully contain
+			any geodesic within its bounds.
+			<br>
+			This can be useful for when you need to do operations that intermix
+			flat map with geodesic, such as intersection detection using
+			equirectangular boxes on a geometry that has geodesic edges, or for
+			searching tree-based structures for geodesic geometries.`
+});
+
+function draw(shape, a, b, c, d, zoom) {
+	// draw the geodesic bounds
+	let minLat = Math.min(a.lat, b.lat);
+	let maxLat = Math.max(a.lat, b.lat);
+	let minLon = Math.min(a.lon, b.lon);
+	let maxLon = Math.max(a.lon, b.lon);
+
+	drawLine("geoBottom", shape, minLat, minLon, minLat, maxLon, { dashed: true });
+	drawLine("geoRight", shape, minLat, maxLon, maxLat, maxLon, { dashed: true });
+	drawLine("geoTop", shape, maxLat, maxLon, maxLat, minLon, { dashed: true });
+	drawLine("geoLeft", shape, maxLat, minLon, minLat, minLon, { dashed: true });
+
+	// draw the planar bounds
+	let res = equibox(shape, a.lat, a.lon, b.lat, b.lon);
+	drawStraightLine("boxBottom", shape, res.minlat, res.minlon, res.minlat, res.maxlon);
+	drawStraightLine("boxTop", shape, res.maxlat, res.minlon, res.maxlat, res.maxlon);
+	drawStraightLine("boxLeft", shape, res.maxlat, res.minlon, res.minlat, res.minlon);
+	drawStraightLine("boxRight", shape, res.maxlat, res.maxlon, res.minlat, res.maxlon);
+
+
+	info.log("1: " + a.lat.toFixed(5) + " " + a.lon.toFixed(5));
+	info.log("2: " + b.lat.toFixed(5) + " " + b.lon.toFixed(5));
+	info.log("------------------------");
+	info.log("min: " + res.minlat.toFixed(5) + " " + res.minlon.toFixed(5));
+	info.log("max: " + res.maxlat.toFixed(5) + " " + res.maxlon.toFixed(5));
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+/*
+--bg-blue: #aad3df;
+--bg-blue: rgba(178, 210, 221);
+--bg-invert-sepia: rgba(66, 59, 46);
+*/
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    color: rgb(198, 180, 145);
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 18px;
+}
+
+#map {
+    width: 100%; 
+    height: 100%;
+    background: rgb(38, 33, 24);
+}
+#map .leaflet-div-icon {
+    width: 20px;
+    height: 20px;
+    border: 0;
+    padding: 0;
+    background: transparent;
+}
+#map .leaflet-div-icon > div {
+    position: relative;
+    left: 50%;
+    top: 50%;
+    background-image: url('https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png');
+    background-size: 25px 41px;
+    width: 25px;
+    height: 41px;
+    display: inline-block;
+    transform: translate(-50%, -100%);
+}
+#map .leaflet-div-icon > div > div {
+    font-weight: bold;
+    position: relative;
+    color: black;
+    background-color: white;
+    top: 4px;
+    left: 3px;
+    width: 19px;
+    height: 19px;
+    border-radius: 10px;
+    text-align: center;
+    line-height: 18px;
+}
+
+#map .leaflet-tile-pane {
+    filter: 
+        invert(1)
+        hue-rotate(180deg)
+        sepia(1)
+        /* hue-rotate(180deg) */
+}
+
+#map .leaflet-marker-icon {
+    filter: 
+        sepia(1)
+        saturate(1.1)
+        brightness(80%)
+        sepia(1)
+        drop-shadow(0 0 5px rgba(0,0,0,0.4))
+}
+
+#controls {
+    position: absolute; 
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    text-align: left;
+    
+    /* background-image: linear-gradient(115deg, 
+        rgba(104, 182, 172, 0.3), rgba(104, 182, 172, 0.1), 
+        transparent,transparent,transparent,
+        rgba(165, 105, 177, 0.1)); */
+    background-image: linear-gradient(115deg, 
+        /* rgba(178, 210, 221),  */
+        /* rgba(50, 100, 150, 0.1) 0 5%, */
+        /* rgba(100, 100, 150, 0.2) 0 5%, */
+        rgba(0, 0, 0, 0.2) 0 15%,
+        transparent 30% 70%,
+        rgba(150, 100, 50, 0.05) 95% 100%
+        /* 20% */
+        /* rgba(104, 182, 172, 0.1),  */
+        /* transparent,transparent,transparent, */
+        /* rgba(165, 105, 177, 0.1) */
+
+        );
+    /* color: white; */
+    color: rgb(198, 180, 145);
+    text-shadow: 0 0 1px rgba(0, 0, 0, 1);
+    pointer-events:none;
+    padding: 20px 30px 28px 30px;
+}
+
+#controls #name {
+    font-size: 40px;
+    color: rgb(255, 240, 211);
+    font-weight: bold;
+    /* text-align: center; */
+}
+#controls #nav {
+    margin-top: 10px;
+}
+
+
+
+a {
+    color: rgb(243, 223, 187);
+    color: rgb(198, 180, 145);
+    /* color: #1d3655; */
+    /* font-size: 20px; */
+    position: relative;
+    pointer-events: all;
+    
+    /* text-decoration: none; */
+}
+
+#controls a:hover {
+    /* color: black; */
+    color: rgb(255, 240, 211);
+    text-shadow: 0 0 1px #1d3655;
+}
+
+#controls #about {
+    margin: 14px 0 20px 0;
+}
+
+
+#controls pre {
+    font-family: monospace;
+    font-size: 14px;
+}
+
+#controls .shapehdr {
+    margin: 20px 0 5px 0;
+}
+
+#controls pre {
+    margin: 0;
+}
+
+#controls .shapehdr pre {
+    /* margin: 0 0 2px 0; */
+    font-weight: bold;
+}
+
+#controls .shapehdr > div {
+    position: absolute;
+    margin-top: 1px;
+    margin-left: 0px;
+    width: 15px;
+    height: 13px;
+    /* border: 1px solid rgba(255,255,255,0.3); */
+}
+
+#controls .hred > div {
+    /* background-color: red; */
+    background-color: rgb(191, 70, 52);
+    border: 2px solid rgb(191, 70, 52);
+    pointer-events: all;
+    cursor: pointer;
+}
+
+#controls .hblue > div {
+    /* background-color: blue; */
+    background-color: rgb(84, 128, 209);
+    border: 2px solid rgb(84, 128, 209);
+    pointer-events: all;
+    cursor: pointer;
+}
+
+#bottom-about {
+    opacity: 0.5;
+    position: absolute;
+    bottom: 0;
+    z-index: 10001;
+    margin: 30px;
+    font-size: 15px;
+    pointer-events: none;
+}
+
+#topright-links {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10002;
+    margin: 30px;
+    font-size: 15px;
+    pointer-events: none;
+}
+
+#github-link svg {
+    filter:
+        invert(50%)
+        sepia(100%)
+}
+
+#github-link:hover {
+    filter:
+        brightness(1.5)
+}
+
+
+@media screen and (max-width: 640px) {
+    #controls {
+        /* left: 0;
+        width: calc(100% - 40px); */
+    }
+    #controls #sphere_info {
+        /* display: inline-block; */
+        /* border:1px solid white; */
+        /* margin-right: 5px; */
+        /* width: calc(50% - 10px); */
+    }
+    #controls #ellipsoid_info {
+        /* display: inline-block; */
+        /* border:1px solid white; */
+        /* margin-left: 5px; */
+        /* width: calc(50% - 10px); */
+    }
+    
+}
+
+
+@media screen and (max-width: 400px) {
+    #controls pre {
+        /* font-size: 11px; */
+    }
+}
+

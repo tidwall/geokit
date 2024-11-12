@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<title>GeoKit - Intersect</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="app.css" />
+<script src="geokit.js"></script>
+<script src="app.js"></script>
+</head>
+<body>
+<script>
+run({ 
+	name: "intersect",
+	show: ["a", "b", "c", "d"],
+	draw: draw,
+	about: `The intersect function takes two geodesic segments and returns their point of intersection.`
+});
+function draw(shape, a, b, c, d, zoom) {
+	let e = intersect(shape, a.lat, a.lon, b.lat, b.lon, c.lat, c.lon, d.lat, d.lon);
+	if (e.isect) {
+		drawLine("ae", shape, a.lat, a.lon, e.lat, e.lon);
+		drawLine("eb", shape, e.lat, e.lon, b.lat, b.lon);
+		drawLine("ce", shape, c.lat, c.lon, e.lat, e.lon);
+		drawLine("ed", shape, e.lat, e.lon, d.lat, d.lon);
+		drawDot("e", shape, e.lat, e.lon);
+	} else {
+		drawLine("ab", shape, a.lat, a.lon, b.lat, b.lon, { dashed: true } );
+		drawLine("cd", shape, c.lat, c.lon, d.lat, d.lon, { dashed: true });
+		drawClear("e", shape);
+	}
+	info.log("A: " + a.lat.toFixed(5) + " " + a.lon.toFixed(5));
+	info.log("B: " + b.lat.toFixed(5) + " " + b.lon.toFixed(5));
+	info.log("C: " + c.lat.toFixed(5) + " " + c.lon.toFixed(5));
+	info.log("D: " + d.lat.toFixed(5) + " " + d.lon.toFixed(5));
+	info.log("------------------------");
+	if (e.isect) {
+		info.log("point: " + e.lat.toFixed(5) + " " + e.lon.toFixed(5));
+		mininfo = e.lat.toFixed(4) + " " + e.lon.toFixed(4)
+	} else {
+		info.log("point: (not intersecting)");
+		mininfo = "(not intersecting)";
+	}
+	
+}
+</script>
+</body>
+</html>

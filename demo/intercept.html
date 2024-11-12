@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<title>GeoKit - Intercept</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="app.css" />
+<script src="geokit.js"></script>
+<script src="app.js"></script>
+</head>
+<body>
+<script>
+run({
+	name: "intercept",
+	show: ["a", "b", "c", "d"],
+	repl: { "a": "1", "b": "Δ", "c": "2", "d": "Δ" },
+	draw: draw,
+	about: `The intercept function takes two geodesic paths and returns the cross-intercept and along-intercept distances.
+	        Cross-intercept is the distance from path 2 to path 1. Along-intercept is the distance from path 1 to path 2.
+			<br>
+			For example, imagine two airplanes starting at different positions, moving in different directions.
+			This function determines where their paths cross.
+			`
+,
+});
+
+function drawColorSegments(name, shape, a, b) {
+	let ab = inverse(shape, a.lat, a.lon, b.lat, b.lon);
+	let colors = [ 'green', 'red', 'purple', 'blue' ];
+	const EQUATOR = 2 * Math.PI * 6378137;
+	const SEGMENT_DIST = (EQUATOR / 3);
+	let o = a;
+	let p, res;
+	let sat1 = 0;
+	for (let i = 0; i < 3; i++) {
+		let sat0 = sat1;
+		sat1 += SEGMENT_DIST;
+		if (i == 2) {
+			sat1 += SEGMENT_DIST * 0.10;
+		}
+		res = direct(shape, a.lat, a.lon, ab.azi1, sat1);
+		p = { lat: res.lat2, lon: res.lon2 };
+		drawLine(name+":p"+i, shape, o.lat, o.lon, p.lat, p.lon, { color: colors[i], dashed: false });
+		if (i < 2) {
+			drawDot(name+":d"+i, shape, p.lat, p.lon, { color: 'black', radius: 2 });
+		}
+		o = p;
+	}
+}
+
+function draw(shape, a, b, c, d, zoom) {
+	let ab = inverse(shape, a.lat, a.lon, b.lat, b.lon);
+	let cd = inverse(shape, c.lat, c.lon, d.lat, d.lon);
+	let res = intercept(shape, a.lat, a.lon, ab.azi1, c.lat, c.lon, cd.azi1);
+	let sat = res.sat;
+	let sxt = res.sxt;
+
+	res = direct(shape, a.lat, a.lon, ab.azi1, sat);
+	let e = { lat: res.lat2, lon: res.lon2 };
+
+	if (sat < ab.s12) {
+		drawLine("ae", shape, a.lat, a.lon, e.lat, e.lon);
+		drawLine("be", shape, b.lat, b.lon, e.lat, e.lon, { dashed: true });
+	} else {
+		drawLine("ab", shape, a.lat, a.lon, b.lat, b.lon);
+		drawDirectLine("be", shape, b.lat, b.lon, ab.azi2, sat-ab.s12);
+	}
+
+	if (sxt < cd.s12) {
+		drawLine("ce", shape, c.lat, c.lon, e.lat, e.lon);
+		drawLine("de", shape, d.lat, d.lon, e.lat, e.lon, { dashed: true });
+	} else {
+		drawLine("cd", shape, c.lat, c.lon, d.lat, d.lon);
+		drawDirectLine("de", shape, d.lat, d.lon, cd.azi2, sxt-cd.s12);
+	}
+	// drawColorSegments("abline", shape, a, b);
+	// drawColorSegments("cdline", shape, c, d);
+
+	drawDot("e", shape, e.lat, e.lon);
+
+	info.log("pnt1: " + a.lat.toFixed(5) + " " + a.lon.toFixed(5));
+	info.log("azi1: " + ab.azi1.toFixed(2) + "°");
+	info.log("pnt2: " + c.lat.toFixed(5) + " " + c.lon.toFixed(5));
+	info.log("azi2: " + cd.azi1.toFixed(2) + "°");
+	info.log("------------------------");
+	info.log("cross: " + toDist(sxt));
+	info.log("along: " + toDist(sat));
+
+	mininfo = toDist(sxt) + " " + toDist(sat);
+
+}
+
+</script>
+</body>
+</html>

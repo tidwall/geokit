@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<title>GeoKit - Equipath</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="app.css" />
+<script src="geokit.js"></script>
+<script src="app.js"></script>
+</head>
+<body>
+<script>
+run({ 
+	name: "equipath",
+	show: ["a", "b", "c", "d"],
+	repl: { "a": "a", "b": "b", "c": "a", "d": "b"},
+	draw: draw,
+	about: `The equipath function takes two equirectangular boxes and calculates
+	        the nearest geodesic path.<br>
+			Similar to the equibox function, this allows for operations that 
+			intermix flat map with geodesics, such as kNN (k-nearest neighbors).`
+});
+
+function draw(shape, a, b, c, d, zoom) {
+	// draw the geodesic bounds
+	let aMinLat = Math.min(a.lat, c.lat);
+	let aMaxLat = Math.max(a.lat, c.lat);
+	let aMinLon = Math.min(a.lon, c.lon);
+	let aMaxLon = Math.max(a.lon, c.lon);
+
+	let bMinLat = Math.min(b.lat, d.lat);
+	let bMaxLat = Math.max(b.lat, d.lat);
+	let bMinLon = Math.min(b.lon, d.lon);
+	let bMaxLon = Math.max(b.lon, d.lon);
+
+	let dashed = false;
+	let res = equipath(shape, aMinLat, aMinLon, aMaxLat, aMaxLon, bMinLat, bMinLon, bMaxLat, bMaxLon);
+	let e = { lat: res.lat1, lon: res.lon1 };
+	let f = { lat: res.lat2, lon: res.lon2 };
+	dashed = res.s12 == 0;
+
+	drawStraightLine("aLeft", shape, aMinLat, aMinLon, aMaxLat, aMinLon, { dashed: dashed });
+	drawStraightLine("aTop", shape, aMaxLat, aMinLon, aMaxLat, aMaxLon, { dashed: dashed });
+	drawStraightLine("aRight", shape, aMaxLat, aMaxLon, aMinLat, aMaxLon, { dashed: dashed });
+	drawStraightLine("aBottom", shape, aMinLat, aMaxLon, aMinLat, aMinLon, { dashed: dashed });
+
+	drawStraightLine("bLeft", shape, bMinLat, bMinLon, bMaxLat, bMinLon, { dashed: dashed });
+	drawStraightLine("bTop", shape, bMaxLat, bMinLon, bMaxLat, bMaxLon, { dashed: dashed });
+	drawStraightLine("bRight", shape, bMaxLat, bMaxLon, bMinLat, bMaxLon, { dashed: dashed });
+	drawStraightLine("bBottom", shape, bMinLat, bMaxLon, bMinLat, bMinLon, { dashed: dashed });
+
+	if (res.s12 > 0) {
+		drawLine("line", shape, e.lat, e.lon, f.lat, f.lon, { dashed: true });
+		drawDot("e", shape, e.lat, e.lon);
+		drawDot("f", shape, f.lat, f.lon);
+	}
+
+	info.log("A min:" + aMinLat.toFixed(5) + " " + aMinLon.toFixed(5));
+	info.log("A max:" + aMaxLat.toFixed(5) + " " + aMaxLon.toFixed(5));
+	info.log("B min:" + bMinLat.toFixed(5) + " " + bMinLon.toFixed(5));
+	info.log("B max:" + bMaxLat.toFixed(5) + " " + bMaxLon.toFixed(5));
+	info.log("------------------------");
+	if (res.s12 > 0) {
+		info.log("pnt1: " + e.lat.toFixed(5) + " " + e.lon.toFixed(5));
+		info.log("azi1: " + res.azi1.toFixed(2) + "°");
+		info.log("dist: " + toDist(res.s12));
+		info.log("pnt2: " + f.lat.toFixed(5) + " " + f.lon.toFixed(5));
+		info.log("azi2: " + res.azi2.toFixed(2) + "°");
+		mininfo = toDist(res.s12);
+	} else {
+		info.log("(intersecting)");
+		mininfo = "(intersecting)";
+	}
+	
+}
+</script>
+</body>
+</html>

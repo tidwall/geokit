@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<title>GeoKit - Track</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="app.css" />
+<script src="geokit.js"></script>
+<script src="app.js"></script>
+</head>
+<body>
+<script>
+run({ 
+	name: "track",
+	show: ["a", "b", "c"],
+	repl: {"a": "1", "b": "Δ", "c": "2"},
+	draw: draw,
+	about: `The track function takes a geodesic path and a point, and returns the cross-track and along-track distances.
+			Cross-track is the distance from the point to the path.
+			Along-track is how far the point is along the path.
+			<br>
+			In other words, this function determines the shortest distance from a point to a path.
+			`,
+});
+function draw(shape, a, b, c, d, zoom) {
+	let ab = inverse(shape, a.lat, a.lon, b.lat, b.lon);
+	let trk = track(shape, a.lat, a.lon, ab.azi1, c.lat, c.lon);
+	let res = direct(shape, a.lat, a.lon, ab.azi1, trk.sat)
+	let e = { lat: res.lat2, lon: res.lon2 };
+	drawLine("ce", shape, c.lat, c.lon, e.lat, e.lon, { dashed: true });
+	if (trk.sat < 0) {
+		drawLine("ab", shape, a.lat, a.lon, b.lat, b.lon);
+		drawLine("ae", shape, a.lat, a.lon, e.lat, e.lon, { dashed: true });
+	} else if (trk.sat > ab.s12) {
+		drawLine("ab", shape, a.lat, a.lon, b.lat, b.lon);
+		drawLine("be", shape, b.lat, b.lon, e.lat, e.lon, { dashed: true });
+	} else {
+		drawLine("ae", shape, a.lat, a.lon, e.lat, e.lon);
+		drawLine("eb", shape, e.lat, e.lon, b.lat, b.lon);
+	}
+	drawDot("e", shape, e.lat, e.lon);
+	info.log("pnt1: " + a.lat.toFixed(5) + " " + a.lon.toFixed(5));
+	info.log("azi1: " + ab.azi1.toFixed(2) + "°");
+	info.log("pnt2: " + c.lat.toFixed(5) + " " + c.lon.toFixed(5));
+	info.log("------------------------");
+	info.log("cross: " + toDist(trk.sxt));
+	info.log("along: " + toDist(trk.sat));
+	mininfo = toDist(trk.sxt) + " " + toDist(trk.sat);
+}
+</script>
+</body>
+</html>

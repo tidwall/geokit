@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<title>GeoKit - Direct</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="app.css" />
+<script src="geokit.js"></script>
+<script src="app.js"></script>
+</head>
+<body>
+<script>
+run({ 
+	name: "direct",
+	show: ["a", "b"],
+	repl: {"a": "1", "b": "Δ" },
+	draw: draw,
+	about: `The direct function takes a point, an initial azimuth, and a distance.
+		    From those it determines a destination point and the final azimuth 
+			continuing further along the geodesic path.`,
+});
+function draw(shape, a, b, c, d, zoom) {
+	let ab = inverse(shape, a.lat, a.lon, b.lat, b.lon);
+	let res = direct(shape, a.lat, a.lon, ab.azi1, ab.s12);
+	drawLine("ab", shape, a.lat, a.lon, b.lat, b.lon);
+	info.log("pnt1: " + a.lat.toFixed(5) + " " + a.lon.toFixed(5));
+	info.log("azi1: " + ab.azi1.toFixed(2) + "°");
+	info.log("dist: " + toDist(ab.s12));
+	info.log("------------------------");
+	info.log("pnt2: " + res.lat2.toFixed(5) + " " + res.lon2.toFixed(5));
+	info.log("azi2: " + res.azi2.toFixed(2) + "°");
+	window.mininfo = res.lat2.toFixed(4) + " " + res.lon2.toFixed(4) + " " +
+		res.azi2.toFixed(2) + "°";
+}
+</script>
+</body>
+</html>

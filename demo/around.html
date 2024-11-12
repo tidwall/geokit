@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<title>GeoKit - Around the World!</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="app.css" />
+<script src="geokit.js"></script>
+<script src="app.js"></script>
+</head>
+<body>
+<script>
+run({
+	name: "around the world!",
+	about: `The world is not a perfect sphere.
+			When circumnavigating an ellipsoid you will not end up in the same
+			place that you started.`,
+	show: ["a", "b"],
+	repl: { "a": "1", "b": "Δ" },
+	init: {
+		"a": { lat: 33.43144, lon: -112.00493 }, 
+		"b": { lat: 41.29480, lon: 2.0783 },
+		"center": { lat: 0.0001, lon: 0.0001 }, 
+		"zoom": 2,
+	},
+	draw: draw,
+});
+function draw(shape, a, b, c, d, zoom) {
+	let earth = 40075000;
+	// earth circumference is about 40,000,000 meters
+	let segsize = earth/3;
+	let res = inverse(shape, a.lat, a.lon, b.lat, b.lon);
+	info.log("1: " + a.lat.toFixed(5) + " " + a.lon.toFixed(5));
+	info.log("Δ: " + res.azi1.toFixed(2) + "°");
+
+	let lat = a.lat;
+	let lon = a.lon;
+	let azi = res.azi1;
+	let n = shape == "ellipsoid" ? 30 : 2;
+	for (let i = 0; i < n*3; i++) {
+		res = direct(shape, lat, lon, azi, segsize);
+		drawLine("op"+i, shape, lat, lon, res.lat2, res.lon2, { dashed: false });
+		lat = res.lat2;
+		lon = res.lon2;
+		azi = res.azi2;
+	}
+}
+</script>
+</body>
+</html>
